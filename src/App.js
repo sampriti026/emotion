@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import './App.css';
 import PieChart from './chart';
+
 import SaveToExcel from './savadataform';
 function App() {
   const emotions = [
@@ -23,8 +24,8 @@ function App() {
 
   return (
     <div className="app-container">
+            <PieChart segments={segments} setSegments={setSegments} setlockedPercentages={setLockedPercentages} lockedPercentages={lockedPercentages} setPercentages={setPercentages}  />
     <div className="form-container">
-      <PieChart segments={segments} setSegments={setSegments} setlockedPercentages={setLockedPercentages} lockedPercentages={lockedPercentages} setPercentages={setPercentages}  />
       <SaveToExcel  segments={segments} />
 
     </div>

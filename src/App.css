@@ -38,35 +38,37 @@
 }
 
 .canvas-container {
+  width: 90vw; /* Adjust width to viewport width for responsiveness */
+  max-width: 650px; /* Maximum width */
+  margin: 20px auto; /* Margin for spacing */
+}
+
+/* Form container only needs to style the form, not position it */
+.form-container {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  height: 100vh; /* Use full height of the viewport */
+  padding: 1rem;
 }
 
 
 .app-container {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
+  justify-content: flex-start; /* Align to the start of the container */
   min-height: 100vh;
   background-color: #f7f7f7;
-  font-family: 'Arial', sans-serif;
 }
 
-.form-container {
-  background: white;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
+
 
 .input-field {
   margin: 0.5rem 0;
   padding: 0.5rem;
   border: 1px solid #ccc;
   border-radius: 4px;
-  width: 100%;
+  width: calc(100% - 1rem); /* Adjust input field width to account for padding */
 }
 
 .button {
@@ -77,10 +79,48 @@
   background-color: #007bff;
   color: white;
   cursor: pointer;
-  width: 100%;
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 .button:hover {
   background-color: #0056b3;
+}
+
+.pie-chart-canvas {
+  display: block; /* Block-level element to fit the container */
+  width: 100%; /* Take the full width of its container */
+  max-width: 650px; /* Match the max-width of the canvas container */
+  margin: auto; /* Center it within the canvas-container */
+  background: white;
+  cursor: pointer;
+}
+
+
+/* Mobile and smaller devices */
+@media (max-width: 768px) {
+  .canvas-container {
+    max-height: 50vh; /* Smaller height for the canvas on mobile */
+    max-width: 50vh; /* Smaller width for the canvas on mobile */
+  }
+
+  .form-container {
+    display: flex;
+  flex-direction: column;
+  padding: 1rem;
+    margin-top: 15rem; /* Add some space above the form */
+    margin-left: 10rem;
+    width: 95%; /* Take up more width on smaller screens */
+  }
+  .pie-chart-canvas {
+    width: 100%; /* Full width of its container */
+    height: auto; /* Adjust height automatically */
+    aspect-ratio: 1 / 1; /* Keep the aspect ratio of the canvas to 1:1 */
+  }
+
+
+
+  /* Adjust font sizes on smaller screens */
+  .App-header {
+    font-size: calc(8px + 2vmin);
+  }
 }

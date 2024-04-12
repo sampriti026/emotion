@@ -12,6 +12,8 @@
     "chart.js": "^4.4.2",
     "chartjs-color": "^2.4.1",
     "chartjs-plugin-datalabels": "^2.2.0",
+    "dotenv": "^16.4.5",
+    "googleapis": "^134.0.0",
     "konva": "^9.3.6",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",

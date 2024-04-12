@@ -236,13 +236,13 @@ const PieChart = ({ segments, setSegments, setPercentages }) => {
 
     drawPieChart();
     console.log();
-  }, [segments, hoveredRadius, hoveredSegment]);
+  }, [segments, hoveredRadius, hoveredSegment, fullRadius]);
 
-  const handleMouseMove = (event) => {
+  const handleInteraction = (clientX, clientY) => {
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
-    const mouseX = event.clientX - rect.left;
-    const mouseY = event.clientY - rect.top;
+    const mouseX = clientX - rect.left;
+    const mouseY = clientY - rect.top;
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
     const angle = Math.atan2(mouseY - centerY, mouseX - centerX);
@@ -254,7 +254,7 @@ const PieChart = ({ segments, setSegments, setPercentages }) => {
       (mouseX - centerX) ** 2 + (mouseY - centerY) ** 2
     );
 
-    if (distanceFromCenter <= centerX) {
+    if (distanceFromCenter <= fullRadius) {
       setHoveredSegment(segmentIndex);
       setHoveredRadius(distanceFromCenter);
     } else {
@@ -263,41 +263,90 @@ const PieChart = ({ segments, setSegments, setPercentages }) => {
     }
   };
 
-  const handleClick = (event) => {
-    if (hoveredSegment !== null) {
-      // Get the canvas size for radius calculation
-      const canvas = canvasRef.current;
-      const rect = canvas.getBoundingClientRect();
-      const centerX = rect.width / 2;
+  const handleMouseEvent = (clientX, clientY, isClick = false) => {
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = clientX - rect.left;
+    const mouseY = clientY - rect.top;
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const angle = Math.atan2(mouseY - centerY, mouseX - centerX);
+    const adjustedAngle = angle >= 0 ? angle : angle + 2 * Math.PI;
+    const distanceFromCenter = Math.sqrt(
+      (mouseX - centerX) ** 2 + (mouseY - centerY) ** 2
+    );
+    const segmentIndex = Math.floor(
+      (adjustedAngle / (2 * Math.PI)) * emotions.length
+    );
 
-      if (hoveredRadius <= fullRadius) {
-        // This check ensures that we only update segments within the pie chart
+    if (distanceFromCenter <= fullRadius) {
+      if (isClick) {
+        // If this is a click event, update the segment
         const newSegments = [...segments];
-        newSegments[hoveredSegment] = Math.min(hoveredRadius, centerX); // Update the radius, but do not exceed the pie chart's radius
+        newSegments[segmentIndex] = distanceFromCenter;
         setSegments(newSegments);
+      } else {
+        // For mouse move, just update the hovered segment
+        setHoveredSegment(segmentIndex);
       }
-
-      if (hoveredSegment !== null && hoveredRadius <= fullRadius) {
-        let newPercentages = [...segments];
-        newPercentages[hoveredSegment] = (
-          (hoveredRadius / fullRadius) *
-          100
-        ).toFixed(1);
-        setPercentages(newPercentages);
-      }
-
-      // Reset after updating
-      setHoveredSegment(null);
-      setHoveredRadius(null);
     }
   };
+
+  const handleMouseMove = (event) => {
+    handleMouseEvent(event.clientX, event.clientY);
+  };
+
+  const handleClick = (event) => {
+    handleMouseEvent(event.clientX, event.clientY, true);
+  };
+
+  const handleTouchMove = (event) => {
+    event.preventDefault();
+    const touch = event.touches[0];
+    handleMouseEvent(touch.clientX, touch.clientY);
+  };
+
+  const handleTouchEnd = (event) => {
+    // No need to calculate position here, we'll use hoveredSegment
+    event.preventDefault();
+    if (hoveredSegment !== null) {
+      // Logic for updating the segment based on touch end
+      const newSegments = [...segments];
+      // Use the last known radius for the hovered segment
+      newSegments[hoveredSegment] = Math.min(
+        fullRadius,
+        newSegments[hoveredSegment]
+      );
+      setSegments(newSegments);
+    }
+  };
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+
+    // Add event listeners for mouse
+    canvas.addEventListener("mousemove", handleMouseMove);
+    canvas.addEventListener("click", handleClick);
+
+    // Add event listeners for touch
+    canvas.addEventListener("touchmove", handleTouchMove, { passive: false });
+    canvas.addEventListener("touchend", handleTouchEnd, { passive: false });
+
+    // Cleanup event listeners
+    return () => {
+      canvas.removeEventListener("mousemove", handleMouseMove);
+      canvas.removeEventListener("click", handleClick);
+      canvas.removeEventListener("touchmove", handleTouchMove);
+      canvas.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, [segments, setHoveredRadius, setHoveredSegment, fullRadius]);
 
   return (
     <div className="canvas-container">
       <canvas
         ref={canvasRef}
-        width={650}
-        height={650}
+        width={fullRadius * 2} // Now using fullRadius for responsive canvas size
+        height={fullRadius * 2}
         onMouseMove={handleMouseMove}
         onClick={handleClick}
         style={{
