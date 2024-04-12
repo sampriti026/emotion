@@ -50,6 +50,7 @@ const PieChart = ({ segments, setSegments, setPercentages }) => {
   const [hoveredSegment, setHoveredSegment] = useState(null);
   const [fullRadius, setFullRadius] = useState(150);
 
+  //test
   useEffect(() => {
     // Dynamically update fullRadius based on window size or other conditions
     const updateRadius = () => {
