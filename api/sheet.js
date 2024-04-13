@@ -76,7 +76,7 @@ exports.default = async (req, res) => {
         values: [data],
       },
     });
-
+    console.log(data)
     res.status(200).json({ success: true, response: response.data });
   } catch (error) {
     console.error('The API returned an error: ' + error);
